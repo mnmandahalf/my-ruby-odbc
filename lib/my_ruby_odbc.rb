@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require_relative "my_ruby_odbc/version"
-require_relative "my_ruby_odbc/my_ruby_odbc"
+require_relative "../ext/my_rust_extension"
 
-module MyRubyOdbc
+module ODBC
   class Error < StandardError; end
   # Your code goes here...
 end
