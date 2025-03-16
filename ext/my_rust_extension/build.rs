@@ -2,28 +2,18 @@ use std::env;
 use std::process::Command;
 
 fn main() {
-    let ruby = env::var("RUBY").unwrap_or_else(|_| "ruby".to_string());
-
-    let libruby_output = Command::new(&ruby)
-        .args(&["-rrbconfig", "-e", "print RbConfig::CONFIG['LIBRUBY']"])
+    let ruby_libdir = Command::new("ruby")
+        .args(["-e", "print RbConfig::CONFIG['libdir']"])
         .output()
-        .expect("failed to get LIBRUBY");
-    let libruby_raw = String::from_utf8_lossy(&libruby_output.stdout);
-    // "libruby.3.2.dylib"
+        .expect("Failed to get Ruby libdir");
 
-    let libruby = libruby_raw
-        .strip_prefix("lib")
-        .unwrap_or(&libruby_raw)
-        .trim_end_matches(".dylib")
-        .trim_end_matches(".so");
+    let ruby_libdir = String::from_utf8_lossy(&ruby_libdir.stdout);
 
-    //  "ruby.3.2"
-    println!("cargo:rustc-link-lib=dylib={}", libruby);
+    // Add the Ruby version to the library search path
+    println!("cargo:rustc-link-search={}", ruby_libdir);
 
-    let libdir_output = Command::new(&ruby)
-        .args(&["-rrbconfig", "-e", "print RbConfig::CONFIG['libdir']"])
-        .output()
-        .expect("failed to get libdir");
-    let libdir = String::from_utf8_lossy(&libdir_output.stdout);
-    println!("cargo:rustc-link-search=native={}", libdir);
+    // Link against the Ruby library
+    println!("cargo:rustc-link-lib=ruby");
+
+    println!("cargo:rerun-if-changed=build.rs");
 }

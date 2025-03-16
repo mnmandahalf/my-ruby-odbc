@@ -8,3 +8,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 magnus = "0.7.1"
+libc = "0.2"

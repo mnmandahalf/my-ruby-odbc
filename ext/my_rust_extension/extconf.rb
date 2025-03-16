@@ -4,13 +4,23 @@ require 'mkmf'
 require "rbconfig"
 
 target_cpu = RbConfig::CONFIG["target_cpu"]
-rust_target = case target_cpu
-              when "x86_64"
-                "x86_64-apple-darwin"
-              when "arm64", "aarch64"
-                "aarch64-apple-darwin"
+rust_target = case RbConfig::CONFIG['host_os']
+              when /darwin|mac os/i
+                case RbConfig::CONFIG["target_cpu"]
+                when "x86_64"
+                  "x86_64-apple-darwin"
+                when "arm64", "aarch64"
+                  "aarch64-apple-darwin"
+                end
+              when /linux/
+                case RbConfig::CONFIG["target_cpu"]
+                when "x86_64"
+                  "x86_64-unknown-linux-gnu"
+                when "arm64", "aarch64"
+                  "aarch64-unknown-linux-gnu"
+                end
               else
-                abort("Unsupported target CPU: #{target_cpu}")
+                abort("Unsupported platform: #{RbConfig::CONFIG['host_os']}")
               end
 
 ENV["ARCHFLAGS"] = "-arch #{target_cpu}"

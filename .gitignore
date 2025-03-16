@@ -12,3 +12,4 @@
 *.a
 mkmf.log
 target/
+/my_ruby_odbc-*.gem
